@@ -9,7 +9,7 @@
 
 ## Table of contents
 
-- [HelloID-Conn-Prov-Target-RAET-FileAPI-DPIA100](#helloid-conn-prov-target-RAET-FileAPI-DPIA100)
+- [HelloID-Conn-Prov-Target-RAET-FileAPI-DPIA100](#helloid-conn-prov-target-raet-fileapi-dpia100)
   - [Table of contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Getting started](#getting-started)
@@ -19,7 +19,6 @@
     - [Connection settings](#connection-settings)
     - [Prerequisites](#prerequisites)
     - [Remarks](#remarks)
-  - [Setup the connector](#setup-the-connector)
   - [Getting help](#getting-help)
   - [HelloID docs](#helloid-docs)
 
@@ -111,8 +110,6 @@ The following settings are required to connect to the API.
 ## Getting help
 
 > [!TIP] > _For more information on how to configure a HelloID PowerShell connector, please refer to our [documentation](https://docs.helloid.com/en/provisioning/target-systems/powershell-v2-target-systems.html) pages_.
-
-> [!TIP] > _If you need help, feel free to ask questions on our [forum](https://forum.helloid.com)_.
 
 ## HelloID docs
 
