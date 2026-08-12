@@ -185,66 +185,54 @@ try {
 
     $output = "$processcode" + "$rubriekscode" + "$objectId" + "$indication" + "$exportDate" + "$creationUser" + "$value" + "$startDate" + "$spaces" + "$productionType"
 
-    # Add a message and the result of each of the validations showing what will happen during enforcement
-    if ($actionContext.DryRun -eq $true) {
-        Write-Information "[DryRun] RAET-FileAPI-DPIA100 export [$output] for account [$($personContext.Person.DisplayName)] will be executed during enforcement"
-    }
-
     # Process
     if ($actionContext.Data.mail -ne $personContext.Person.Contact.Business.Email) {
-        if (-not($actionContext.DryRun -eq $true)) {
-            Write-Information "Exporting [$output] RAET-FileAPI-DPIA100 for account [$($personContext.Person.DisplayName)]"
+        Write-Information "Exporting [$output] RAET-FileAPI-DPIA100 for account [$($personContext.Person.DisplayName)]"
 
-            try {
-                New-RAET-FileAPI-DPIA100-Session -ClientId $actionContext.Configuration.clientId -ClientSecret $actionContext.Configuration.clientSecret -TenantId $actionContext.Configuration.tenantId
+        New-RAET-FileAPI-DPIA100-Session -ClientId $actionContext.Configuration.clientId -ClientSecret $actionContext.Configuration.clientSecret -TenantId $actionContext.Configuration.tenantId
 
-                $boundary = "foo_bar_baz"
-                $LF = "`r`n"
-                $bodyLines = (
-                    "--$boundary",
-                    "Content-Type: application/json; charset=UTF-8$LF",
-                    "{",
-                    "`"name`":`"$filename`",",
-                    "`"businesstypeid`":`"101020`"",
-                    "}$LF",
-                    "--$boundary$LF",
-                    "$output",
-                    "--$boundary--"
-                ) -join $LF
+        $boundary = "foo_bar_baz"
+        $LF = "`r`n"
+        $bodyLines = (
+            "--$boundary",
+            "Content-Type: application/json; charset=UTF-8$LF",
+            "{",
+            "`"name`":`"$filename`",",
+            "`"businesstypeid`":`"101020`"",
+            "}$LF",
+            "--$boundary$LF",
+            "$output",
+            "--$boundary--"
+        ) -join $LF
 
-                $splatUpdateParams = @{
-                    Uri         = "$($Script:BaseUri)/v1.0/files?uploadType=multipart"
-                    Headers     = $Script:AuthenticationHeaders
-                    Method      = 'POST'
-                    ContentType = "multipart/related;boundary=$boundary"
-                    Body        = $bodyLines
+        $splatUpdateParams = @{
+            Uri         = "$($Script:BaseUri)/v1.0/files?uploadType=multipart"
+            Headers     = $Script:AuthenticationHeaders
+            Method      = 'POST'
+            ContentType = "multipart/related;boundary=$boundary"
+            Body        = $bodyLines
                     
-                }
-
-                $result = Invoke-WebRequest @splatUpdateParams
-
-                $outputContext.Data = $actionContext.Data
-                
-                $auditLogMessage = "Export [$output] RAET-FileAPI-DPIA100 was successful. AccountReference is: [$($outputContext.AccountReference)]"
-            
-                $outputContext.AccountCorrelated = $false
-                $outputContext.success = $true
-                $outputContext.AuditLogs.Add([PSCustomObject]@{
-                        Action  = "UpdateAccount"
-                        Message = $auditLogMessage
-                        IsError = $false
-                    })
-            }
-            catch {
-                $auditLogMessage = "Export [$output] RAET-FileAPI-DPIA100 failed. Error: $_.Exception.Message"
-                $outputContext.AuditLogs.Add([PSCustomObject]@{
-                        Action  = "UpdateAccount"
-                        Message = $auditLogMessage
-                        IsError = $true
-                    })
-            }
-        
         }
+
+        if (-not($actionContext.DryRun -eq $true)) {
+            $result = Invoke-WebRequest @splatUpdateParams
+        }
+        else {
+            Write-Information "[DryRun] RAET-FileAPI-DPIA100 export [$output] for account [$($personContext.Person.DisplayName)] will be executed during enforcement"
+        }
+
+        $outputContext.Data = $actionContext.Data
+                
+        $auditLogMessage = "Export [$output] RAET-FileAPI-DPIA100 was successful. AccountReference is: [$($outputContext.AccountReference)]"
+            
+        $outputContext.AccountCorrelated = $false
+        $outputContext.success = $true
+        $outputContext.AuditLogs.Add([PSCustomObject]@{
+                Action  = "UpdateAccount"
+                Message = $auditLogMessage
+                IsError = $false
+            })
+        
     }
     else {
         $auditLogMessage = "Export RAET-FileAPI-DPIA100 not required. Nothing to update for account [$($personContext.Person.DisplayName)]"
